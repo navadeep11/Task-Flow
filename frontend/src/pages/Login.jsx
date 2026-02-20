@@ -1,0 +1,122 @@
+import { useState } from "react"
+import { useLoginMutation } from "../app/api/authApi"
+import { useDispatch, useSelector } from "react-redux"
+import { setCredentials } from "../app/slices/authSlice"
+import { useNavigate, Navigate } from "react-router-dom"
+import Button from "../components/ui/Button"
+import Input from "../components/ui/Input"
+
+const Login = () => {
+  const { token } = useSelector((state) => state.auth)
+
+  // Redirect if already logged in
+  if (token) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  })
+
+  const [errors, setErrors] = useState({})
+  const [serverError, setServerError] = useState("")
+
+  // RTK Query mutation for login
+
+  const [login, { isLoading }] = useLoginMutation()
+  const dispatch = useDispatch()
+
+
+  const navigate = useNavigate()
+
+  // Validate form inputs before submission
+  const validate = () => {
+    const newErrors = {}
+
+    if (!formData.email) {
+      newErrors.email = "Email is required"
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Enter a valid email"
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required"
+    }
+
+    return newErrors
+  }
+
+  // Handle input changes and clear errors on change
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    })
+
+    setErrors({ ...errors, [e.target.name]: "" })
+    setServerError("")
+  }
+
+  // Handle form submission for login
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    const validationErrors = validate()
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      return
+    }
+
+    try {
+      const res = await login(formData).unwrap()
+      dispatch(setCredentials(res))
+      navigate("/dashboard")
+    } catch (err) {
+      setServerError(err?.data?.message || "Invalid credentials")
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-md">
+        <h2 className="text-2xl font-bold text-center mb-6">
+          Login
+        </h2>
+
+        {serverError && (
+          <div className="bg-red-100 text-red-600 p-2 rounded-lg mb-4 text-sm">
+            {serverError}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            label="Email"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            error={errors.email}
+          />
+
+          <Input
+            label="Password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            error={errors.password}
+          />
+
+          <Button type="submit" loading={isLoading}>
+            Login
+          </Button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+export default Login
