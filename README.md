@@ -267,7 +267,6 @@ Below is the high-level component architecture:
 - Functional Authentication System
 - CRUD-enabled Dashboard
 - API Documentation
-- Postman Collection
 - Backend Execution Logs
 - Production Scaling Strategy
 
