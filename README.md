@@ -276,4 +276,4 @@ Below is the high-level component architecture:
 # 👨‍💻 Author
 
 Gujjula Sai Navadeep Reddy 
-Frontend Developer Intern Candidate
+
