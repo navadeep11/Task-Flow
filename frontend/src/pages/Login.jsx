@@ -5,6 +5,7 @@ import { setCredentials } from "../app/slices/authSlice"
 import { useNavigate, Navigate } from "react-router-dom"
 import Button from "../components/ui/Button"
 import Input from "../components/ui/Input"
+import { Link } from "react-router-dom"
 
 const Login = () => {
   const { token } = useSelector((state) => state.auth)
@@ -113,6 +114,16 @@ const Login = () => {
           <Button type="submit" loading={isLoading}>
             Login
           </Button>
+
+          <div className="text-center mt-4 text-sm text-gray-600">
+            Don’t have an account?{" "}
+            <Link
+              to="/register"
+              className="text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Register
+            </Link>
+          </div>
         </form>
       </div>
     </div>
